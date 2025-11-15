@@ -1,177 +1,222 @@
 import Colors from '@/constants/Colors';
-import React from 'react';
-import { FlatList, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, View } from '../Themed';
-
-type Asset = {
-	id: string;
-	name: string;
-	symbol: string;
-	amount: string;
-	usd: string;
-};
-
-const ASSETS: Asset[] = [
-	{ id: '1', name: 'Bitcoin', symbol: 'BTC', amount: '0.125', usd: '$6,250' },
-	{ id: '2', name: 'Ethereum', symbol: 'ETH', amount: '1.75', usd: '$3,100' },
-	{ id: '3', name: 'USDC', symbol: 'USDC', amount: '520.00', usd: '$520' },
-];
-
-const TRANSACTIONS = [
-	{ id: 't1', title: 'Coffee', subtitle: 'Starbucks', date: 'Nov 12', amount: '-$5.20' },
-	{ id: 't2', title: 'Salary', subtitle: 'Acme Corp', date: 'Nov 10', amount: '+$3,200' },
-	{ id: 't3', title: 'Swap BTC → ETH', subtitle: 'On-chain', date: 'Nov 09', amount: '-$1,200' },
-];
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, TouchableOpacity, View, Text, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useWallet } from '@/context/WalletContext';
+import BalanceDisplay from '../wallet/BalanceDisplay';
+import TransactionHistory from '../wallet/TransactionHistory';
 
 export default function WalletScreen() {
-	const totalBalance = '$9,870.00';
+	const { isAuthenticated, hasWallet, connected, blockNumber } = useWallet();
+	const [showActions, setShowActions] = useState(false);
 
-	function renderAsset({ item }: { item: Asset }) {
+	// Show wallet setup if no wallet
+	if (!hasWallet) {
 		return (
-			<View style={styles.assetCard}>
-				<View style={styles.assetLeft}>
-					<View style={styles.avatar}>
-						<Text style={styles.avatarText}>{item.symbol[0]}</Text>
-					</View>
-					<View>
-						<Text style={styles.assetName}>{item.name}</Text>
-						<Text style={styles.assetSymbol}>{item.symbol}</Text>
-					</View>
-				</View>
-				<View style={styles.assetRight}>
-					<Text style={styles.assetAmount}>{item.amount}</Text>
-					<Text style={styles.assetUsd}>{item.usd}</Text>
-				</View>
+			<View style={styles.setupContainer}>
+				<Ionicons name="wallet-outline" size={64} color={Colors.light.tint} />
+				<Text style={styles.setupTitle}>Welcome to PrivaChain</Text>
+				<Text style={styles.setupSubtitle}>
+					Create or restore a wallet to get started
+				</Text>
+				<TouchableOpacity style={styles.setupButton}>
+					<Text style={styles.setupButtonText}>Create Wallet</Text>
+				</TouchableOpacity>
 			</View>
 		);
 	}
 
-	function renderTransaction({ item }: { item: any }) {
-		const positive = item.amount.startsWith('+');
+	// Show locked state if not authenticated
+	if (!isAuthenticated) {
 		return (
-			<View style={styles.txRow}>
-				<View style={styles.txIcon}>
-					<Text style={styles.txIconText}>{item.title[0]}</Text>
-				</View>
-				<View style={styles.txMeta}>
-					<Text style={styles.txTitle}>{item.title}</Text>
-					<Text style={styles.txSubtitle}>{item.subtitle}</Text>
-				</View>
-				<View style={styles.txRight}>
-					<Text style={[styles.txAmount, positive ? styles.positive : styles.negative]}>{item.amount}</Text>
-					<Text style={styles.txDate}>{item.date}</Text>
-				</View>
+			<View style={styles.lockedContainer}>
+				<Ionicons name="lock-closed" size={64} color={Colors.light.tint} />
+				<Text style={styles.lockedTitle}>Wallet Locked</Text>
+				<Text style={styles.lockedSubtitle}>
+					Authenticate to access your wallet
+				</Text>
 			</View>
 		);
 	}
+
+	const handleSend = () => {
+		Alert.alert('Send', 'Send functionality coming soon');
+	};
+
+	const handleReceive = () => {
+		Alert.alert('Receive', 'Receive functionality coming soon');
+	};
+
+	const handleDeposit = () => {
+		Alert.alert('Deposit', 'Deposit (Public → Private) functionality coming soon');
+	};
+
+	const handleWithdraw = () => {
+		Alert.alert('Withdraw', 'Withdraw (Private → Public) functionality coming soon');
+	};
+
+
 
 	return (
 		<ScrollView style={styles.container} contentContainerStyle={styles.content}>
-			<View style={styles.header}>
-				<Text style={styles.headerLabel}>Total balance</Text>
-				<Text style={styles.headerBalance}>{totalBalance}</Text>
-				<Text style={styles.headerSub}>Available across all wallets</Text>
+			{/* Connection Status */}
+			<View style={styles.statusBar}>
+				<View style={styles.statusItem}>
+					<View style={[styles.statusDot, { backgroundColor: connected ? '#16a34a' : '#dc2626' }]} />
+					<Text style={styles.statusText}>
+						{connected ? 'Connected' : 'Disconnected'}
+					</Text>
+				</View>
+				{connected && (
+					<Text style={styles.blockNumber}>Block: {blockNumber}</Text>
+				)}
 			</View>
 
+			{/* Balance Display */}
+			<BalanceDisplay showPrivate={true} />
+
+			{/* Quick Actions */}
 			<View style={styles.actionsRow}>
-				<TouchableOpacity style={[styles.actionButton, { backgroundColor: Colors.light.tint }]}> 
+				<TouchableOpacity style={[styles.actionButton, styles.actionPrimary]} onPress={handleSend}> 
+					<Ionicons name="arrow-up" size={20} color="#fff" />
 					<Text style={styles.actionText}>Send</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={[styles.actionButton, styles.actionOutline]}> 
+				<TouchableOpacity style={[styles.actionButton, styles.actionSecondary]} onPress={handleReceive}> 
+					<Ionicons name="arrow-down" size={20} color={Colors.light.tint} />
 					<Text style={styles.actionTextOutline}>Receive</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={[styles.actionButton, styles.actionOutline]}> 
-					<Text style={styles.actionTextOutline}>Buy</Text>
+				<TouchableOpacity style={[styles.actionButton, styles.actionSecondary]} onPress={handleDeposit}> 
+					<Ionicons name="shield" size={20} color={Colors.light.tint} />
+					<Text style={styles.actionTextOutline}>Shield</Text>
+				</TouchableOpacity>
+				<TouchableOpacity style={[styles.actionButton, styles.actionSecondary]} onPress={handleWithdraw}> 
+					<Ionicons name="eye" size={20} color={Colors.light.tint} />
+					<Text style={styles.actionTextOutline}>Unshield</Text>
 				</TouchableOpacity>
 			</View>
 
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Assets</Text>
-				<FlatList
-					data={ASSETS}
-					keyExtractor={(i) => i.id}
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					renderItem={renderAsset}
-					contentContainerStyle={styles.assetsList}
-				/>
-			</View>
-
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Recent activity</Text>
-				<FlatList
-					data={TRANSACTIONS}
-					keyExtractor={(i) => i.id}
-					renderItem={renderTransaction}
-					scrollEnabled={false}
-				/>
-			</View>
+			{/* Transaction History */}
+			<TransactionHistory limit={10} showFilter={true} />
 		</ScrollView>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1 },
-	content: { padding: 20, paddingBottom: 40 },
-	header: { marginBottom: 18 },
-		headerLabel: { fontSize: 14, color: Colors.light.tabIconDefault, marginBottom: 6 },
-	headerBalance: { fontSize: 34, fontWeight: '700', color: Colors.light.text },
-		headerSub: { fontSize: 12, color: Colors.light.tabIconDefault, marginTop: 6 },
-	actionsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 18, marginBottom: 18 },
-	actionButton: {
+	container: {
 		flex: 1,
-		marginHorizontal: 6,
-		paddingVertical: 12,
-		borderRadius: 12,
+		backgroundColor: '#fff',
+	},
+	content: {
+		padding: 20,
+		paddingBottom: 100,
+	},
+	setupContainer: {
+		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'center',
+		padding: 40,
 	},
-		actionOutline: {
-			backgroundColor: 'transparent',
-			borderWidth: 1,
-			borderColor: Colors.light.tabIconDefault,
-		},
-	actionText: { color: '#fff', fontWeight: '600' },
-	actionTextOutline: { color: Colors.light.text, fontWeight: '600' },
-	section: { marginTop: 6 },
-	sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
-	assetsList: { paddingBottom: 6 },
-	assetCard: {
-		width: 220,
-		marginRight: 12,
-		backgroundColor: Colors.light.background,
-		borderRadius: 14,
-		padding: 14,
+	setupTitle: {
+		fontSize: 24,
+		fontWeight: '700',
+		marginTop: 24,
+		marginBottom: 8,
+		color: '#000',
+	},
+	setupSubtitle: {
+		fontSize: 16,
+		color: '#666',
+		textAlign: 'center',
+		marginBottom: 32,
+	},
+	setupButton: {
+		backgroundColor: Colors.light.tint,
+		paddingHorizontal: 32,
+		paddingVertical: 16,
+		borderRadius: 12,
+	},
+	setupButtonText: {
+		color: '#fff',
+		fontSize: 16,
+		fontWeight: '600',
+	},
+	lockedContainer: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		padding: 40,
+	},
+	lockedTitle: {
+		fontSize: 24,
+		fontWeight: '700',
+		marginTop: 24,
+		marginBottom: 8,
+		color: '#000',
+	},
+	lockedSubtitle: {
+		fontSize: 16,
+		color: '#666',
+		textAlign: 'center',
+	},
+	statusBar: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		paddingHorizontal: 16,
+		paddingVertical: 12,
+		backgroundColor: '#f9fafb',
+		borderRadius: 12,
+		marginBottom: 20,
+	},
+	statusItem: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'space-between',
+		gap: 8,
 	},
-	assetLeft: { flexDirection: 'row', alignItems: 'center' },
-	avatar: {
-		width: 44,
-		height: 44,
-		borderRadius: 44,
-		backgroundColor: Colors.light.tint,
+	statusDot: {
+		width: 8,
+		height: 8,
+		borderRadius: 4,
+	},
+	statusText: {
+		fontSize: 14,
+		fontWeight: '500',
+		color: '#374151',
+	},
+	blockNumber: {
+		fontSize: 12,
+		color: '#6b7280',
+	},
+	actionsRow: {
+		flexDirection: 'row',
+		gap: 12,
+		marginBottom: 30,
+	},
+	actionButton: {
+		flex: 1,
+		padding: 16,
+		borderRadius: 12,
 		alignItems: 'center',
+		flexDirection: 'row',
 		justifyContent: 'center',
-		marginRight: 10,
+		gap: 8,
 	},
-	avatarText: { color: '#fff', fontWeight: '700' },
-	assetName: { fontSize: 15, fontWeight: '600' },
-		assetSymbol: { fontSize: 12, color: Colors.light.tabIconDefault },
-	assetRight: { alignItems: 'flex-end' },
-	assetAmount: { fontSize: 15, fontWeight: '700' },
-		assetUsd: { fontSize: 12, color: Colors.light.tabIconDefault },
-		txRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: Colors.light.tabIconDefault },
-		txIcon: { width: 44, height: 44, borderRadius: 44, backgroundColor: Colors.light.background, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-	txIconText: { fontWeight: '700' },
-	txMeta: { flex: 1 },
-	txTitle: { fontSize: 14, fontWeight: '600' },
-		txSubtitle: { fontSize: 12, color: Colors.light.tabIconDefault, marginTop: 2 },
-	txRight: { alignItems: 'flex-end' },
-	txAmount: { fontSize: 14, fontWeight: '700' },
-	positive: { color: '#16a34a' },
-	negative: { color: '#dc2626' },
-		txDate: { fontSize: 12, color: Colors.light.tabIconDefault, marginTop: 4 },
+	actionPrimary: {
+		backgroundColor: Colors.light.tint,
+	},
+	actionSecondary: {
+		borderWidth: 1.5,
+		borderColor: Colors.light.tint,
+		backgroundColor: 'transparent',
+	},
+	actionText: {
+		color: '#fff',
+		fontWeight: '600',
+		fontSize: 14,
+	},
+	actionTextOutline: {
+		color: Colors.light.tint,
+		fontWeight: '600',
+		fontSize: 14,
+	},
 });
-
