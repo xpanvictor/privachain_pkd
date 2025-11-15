@@ -110,7 +110,7 @@ export const generateWithdrawProof = async (params: {
   amount: string;
   recipient: string;
 }): Promise<{ proof: Uint8Array | number[]; publicInputs: Uint8Array | number[] }> => {
-  // TODO: call actual withdraw proving process (worker)
+  // TODO: call actual withdraw proving process
   const proof = new Uint8Array([9, 9, 9]);
   const publicInputs = new Uint8Array([8, 8, 8]);
   return { proof, publicInputs };
@@ -227,5 +227,6 @@ export const disconnectApi = async (api?: ApiPromise) => {
     if (api && api.disconnect) await api.disconnect();
   } catch (err) {
     // ignore
+    console.warn('Failed to disconnect API:', err);
   }
 };
