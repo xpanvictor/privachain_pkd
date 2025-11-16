@@ -32,8 +32,18 @@ impl frame_system::Config for Test {
     type Block = Block;
 }
 
+parameter_types! {
+    // Defines a constant named `PrivacyPalletId` of type `PalletId`
+    pub const PrivacyPalletId: PalletId = PalletId(*b"priv_id_");
+    pub const MaxEncryptedNoteLength: u32 = 1024;
+}
+
 impl privacy_pallet::Config for Test {
     type RuntimeEvent = RuntimeEvent;
+    type Currency = ();
+    type CommitmentIndexType = u32;
+    type PalletId = PrivacyPalletId;
+    type MaxEncryptedNoteLength = MaxEncryptedNoteLength;
 }
 
 pub fn new_test_ext() -> TestExternalities {
