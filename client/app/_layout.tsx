@@ -1,3 +1,4 @@
+import 'react-native-url-polyfill/auto'; // Polyfill for URL support
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -55,6 +56,14 @@ function RootLayoutNav() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          {/* <Stack.Screen 
+            name="zktest" 
+            options={{ 
+              presentation: 'modal',
+              title: 'ZK Integration Test',
+              headerShown: true,
+            }} 
+          /> */}
         </Stack>
       </ThemeProvider>
     </WalletProvider>

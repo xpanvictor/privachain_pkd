@@ -211,7 +211,7 @@ export function useTransaction<TParams>(
       const signer = createKeyringPair(keys.mnemonic);
 
       // Submit transaction
-      const txResult = await txFunction(params, signer);
+      const txResult = await txFunction(params, signer as any);
       
       setResult(txResult);
       setSubmitting(false);
@@ -328,7 +328,7 @@ export function useDepositEvents(
   const subscription = useRef<EventSubscription | null>(null);
 
   useEffect(() => {
-    subscription.current = subscribeToDeposits((data) => {
+    subscription.current = subscribeToDeposits((data:any) => {
       setDeposits((prev) => [...prev, data]);
       if (callback) callback(data);
     });
@@ -359,7 +359,7 @@ export function usePrivateTransferEvents(
   const subscription = useRef<EventSubscription | null>(null);
 
   useEffect(() => {
-    subscription.current = subscribeToPrivateTransfers((data) => {
+    subscription.current = subscribeToPrivateTransfers((data: any) => {
       setTransfers((prev) => [...prev, data]);
       if (callback) callback(data);
     });
@@ -390,7 +390,7 @@ export function useWithdrawEvents(
   const subscription = useRef<EventSubscription | null>(null);
 
   useEffect(() => {
-    subscription.current = subscribeToWithdraws((data) => {
+    subscription.current = subscribeToWithdraws((data: any) => {
       setWithdrawals((prev) => [...prev, data]);
       if (callback) callback(data);
     });

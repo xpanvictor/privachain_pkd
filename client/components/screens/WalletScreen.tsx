@@ -1,14 +1,21 @@
 import Colors from '@/constants/Colors';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View, Text, Alert } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View, Text, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useWallet } from '@/context/WalletContext';
 import BalanceDisplay from '../wallet/BalanceDisplay';
 import TransactionHistory from '../wallet/TransactionHistory';
+import SendModal from '../modals/SendModal';
+import ReceiveModal from '../modals/ReceiveModal';
+import DepositModal from '../modals/DepositModal';
+import WithdrawModal from '../modals/WithdrawModal';
 
 export default function WalletScreen() {
 	const { isAuthenticated, hasWallet, connected, blockNumber } = useWallet();
-	const [showActions, setShowActions] = useState(false);
+	const [showSendModal, setShowSendModal] = useState(false);
+	const [showReceiveModal, setShowReceiveModal] = useState(false);
+	const [showDepositModal, setShowDepositModal] = useState(false);
+	const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
 	// Show wallet setup if no wallet
 	if (!hasWallet) {
@@ -39,21 +46,7 @@ export default function WalletScreen() {
 		);
 	}
 
-	const handleSend = () => {
-		Alert.alert('Send', 'Send functionality coming soon');
-	};
 
-	const handleReceive = () => {
-		Alert.alert('Receive', 'Receive functionality coming soon');
-	};
-
-	const handleDeposit = () => {
-		Alert.alert('Deposit', 'Deposit (Public → Private) functionality coming soon');
-	};
-
-	const handleWithdraw = () => {
-		Alert.alert('Withdraw', 'Withdraw (Private → Public) functionality coming soon');
-	};
 
 
 
@@ -77,19 +70,31 @@ export default function WalletScreen() {
 
 			{/* Quick Actions */}
 			<View style={styles.actionsRow}>
-				<TouchableOpacity style={[styles.actionButton, styles.actionPrimary]} onPress={handleSend}> 
+				<TouchableOpacity 
+					style={[styles.actionButton, styles.actionPrimary]} 
+					onPress={() => setShowSendModal(true)}
+				> 
 					<Ionicons name="arrow-up" size={20} color="#fff" />
 					<Text style={styles.actionText}>Send</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={[styles.actionButton, styles.actionSecondary]} onPress={handleReceive}> 
+				<TouchableOpacity 
+					style={[styles.actionButton, styles.actionSecondary]} 
+					onPress={() => setShowReceiveModal(true)}
+				> 
 					<Ionicons name="arrow-down" size={20} color={Colors.light.tint} />
 					<Text style={styles.actionTextOutline}>Receive</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={[styles.actionButton, styles.actionSecondary]} onPress={handleDeposit}> 
+				<TouchableOpacity 
+					style={[styles.actionButton, styles.actionSecondary]} 
+					onPress={() => setShowDepositModal(true)}
+				> 
 					<Ionicons name="shield" size={20} color={Colors.light.tint} />
 					<Text style={styles.actionTextOutline}>Shield</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={[styles.actionButton, styles.actionSecondary]} onPress={handleWithdraw}> 
+				<TouchableOpacity 
+					style={[styles.actionButton, styles.actionSecondary]} 
+					onPress={() => setShowWithdrawModal(true)}
+				> 
 					<Ionicons name="eye" size={20} color={Colors.light.tint} />
 					<Text style={styles.actionTextOutline}>Unshield</Text>
 				</TouchableOpacity>
@@ -97,6 +102,43 @@ export default function WalletScreen() {
 
 			{/* Transaction History */}
 			<TransactionHistory limit={10} showFilter={true} />
+
+			{/* Modals */}
+			<Modal
+				visible={showSendModal}
+				animationType="slide"
+				presentationStyle="pageSheet"
+				onRequestClose={() => setShowSendModal(false)}
+			>
+				<SendModal onClose={() => setShowSendModal(false)} />
+			</Modal>
+
+			<Modal
+				visible={showReceiveModal}
+				animationType="slide"
+				presentationStyle="pageSheet"
+				onRequestClose={() => setShowReceiveModal(false)}
+			>
+				<ReceiveModal onClose={() => setShowReceiveModal(false)} />
+			</Modal>
+
+			<Modal
+				visible={showDepositModal}
+				animationType="slide"
+				presentationStyle="pageSheet"
+				onRequestClose={() => setShowDepositModal(false)}
+			>
+				<DepositModal onClose={() => setShowDepositModal(false)} />
+			</Modal>
+
+			<Modal
+				visible={showWithdrawModal}
+				animationType="slide"
+				presentationStyle="pageSheet"
+				onRequestClose={() => setShowWithdrawModal(false)}
+			>
+				<WithdrawModal onClose={() => setShowWithdrawModal(false)} />
+			</Modal>
 		</ScrollView>
 	);
 }

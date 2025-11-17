@@ -7,12 +7,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { getSettings, saveSettings } from '@/storage/database';
 import { checkBiometricCapability, setupPin, removePin } from '@/security/auth';
 import PinInput from '../auth/PinInput';
 
 export default function SettingsScreen() {
+	const router = useRouter();
 	const [biometricsEnabled, setBiometricsEnabled] = useState(false);
 	const [hasBiometricHardware, setHasBiometricHardware] = useState(false);
 	const [autoLockMinutes, setAutoLockMinutes] = useState(5);
@@ -209,6 +211,23 @@ export default function SettingsScreen() {
 			</View>
 
 			<Text style={styles.sectionTitle}>Advanced</Text>
+
+			{/* ZK Test Screen */}
+			<TouchableOpacity 
+				style={styles.settingCard} 
+				onPress={() => router.push('/zktest' as any)}
+			>
+				<View style={styles.settingRow}>
+					<View style={styles.settingLeft}>
+						<Ionicons name="flask" size={24} color={Colors.light.tint} />
+						<View style={styles.settingText}>
+							<Text style={styles.settingLabel}>ZK Integration Test</Text>
+							<Text style={styles.settingDescription}>Test zero-knowledge proof system</Text>
+						</View>
+					</View>
+					<Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+				</View>
+			</TouchableOpacity>
 
 			{/* Remove PIN */}
 			<TouchableOpacity style={styles.settingCard} onPress={handleRemovePin}>
